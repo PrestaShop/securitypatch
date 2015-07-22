@@ -1,0 +1,8 @@
+# Module's generated files / folders
+backup/
+patches/
+config_*
+
+# IDEs / Tools
+.sass-cache/
+.idea/
