@@ -36,6 +36,9 @@ class HotFix extends Module
     /** @var Array Module's settings. */
     private $settings = array();
 
+    /** @var int Hotfixes count. */
+    private $count;
+
     /**
      * Module's constructor.
      */
@@ -62,10 +65,14 @@ class HotFix extends Module
         $this->settings = new HotfixSettings(
             include(dirname(__FILE__).DIRECTORY_SEPARATOR.'settings'.DIRECTORY_SEPARATOR.'settings.php')
         );
+
+        $this->count = 13;
     }
 
     /**
      * Module installation.
+     *
+     * @return bool Success of the operation.
      */
     public function install()
     {
@@ -76,13 +83,16 @@ class HotFix extends Module
             && $installation->installTables()
             && $installation->createFolder($this->settings->get('paths/backup'))
             && $installation->createFolder($this->settings->get('paths/patches'))
-            && $this->registerHook('displayBackOfficeFooter');
-
-
+            && $installation->registerHooks($this, array(
+                'displayBackOfficeFooter',
+                'displayBackOfficeHeader',
+            ));
     }
 
     /**
      * Module uninstallation.
+     *
+     * @return null
      */
     public function uninstall()
     {
@@ -93,5 +103,57 @@ class HotFix extends Module
             && $installation->removeFolder($this->settings->get('paths/backup'))
             && $installation->removeFolder($this->settings->get('paths/patches'))
             && parent::uninstall();
+    }
+
+    /**
+     * Add the needed files for this module to the header.
+     *
+     * @return null
+     */
+    public function hookDisplayBackOfficeHeader()
+    {
+        if (!$this->isActive()) {
+            return;
+        }
+
+        if ($this->count > 0) {
+            $this->context->controller->addCSS($this->_path.'views/css/hotfix-header.css', 'all');
+        }
+    }
+
+    /**
+     * Method called by the hook "displayBackOfficeFooter".
+     *
+     * Add the template showing the need to hotfix a bug.
+     *
+     * @return null|Smarty_Internal_Template
+     */
+    public function hookDisplayBackOfficeFooter()
+    {
+        if (!$this->isActive()) {
+            return null;
+        }
+
+        if ($this->count > 0) {
+            $this->context->smarty->assign(array(
+                'count' => $this->count
+            ));
+
+            return $this->display(__FILE__, 'header.tpl');
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the active status of the module.
+     *
+     * @return bool Active status.
+     */
+    private final function isActive()
+    {
+        return Module::isEnabled($this->name)
+            && $this->active
+            && Tools::getValue('uninstall') != $this->name;
     }
 }

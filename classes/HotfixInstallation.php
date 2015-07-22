@@ -85,8 +85,6 @@ class HotfixInstallation
     {
         $prefix = _DB_PREFIX_;
 
-        var_dump("DROP TABLE IF EXISTS `{$prefix}upgrade_checklist`");
-
         $success = DB::getInstance()->execute("
             DROP TABLE IF EXISTS `{$prefix}upgrade_checklist`
         ");
@@ -104,6 +102,28 @@ class HotfixInstallation
     {
         $folderPath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.$path;
 
-        return rmdir($folderPath);
+        if (is_dir($folderPath)) {
+            return rmdir($folderPath);
+        }
+
+        return true;
+    }
+
+    /**
+     * Register all needed hooks to the module.
+     *
+     * @param Module $module Module to anchor.
+     * @param array $hooks Hooks list.
+     * @return bool Success of the operation.
+     */
+    public function registerHooks($module, $hooks)
+    {
+        $success = true;
+
+        foreach ($hooks as $hook) {
+            $success &= $module->registerHook($hook);
+        }
+
+        return $success;
     }
 }

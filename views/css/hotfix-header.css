@@ -1,0 +1,11 @@
+/* line 3, ../sass/hotfix-header.scss */
+#hotfix-header { box-sizing: border-box; position: fixed; top: 0; left: 0; right: 0; z-index: 19; height: 40px; padding-top: 10px; padding-left: 10px; padding-right: 10px; background: #feffc5; color: #afab37; line-height: 20px; vertical-align: middle; }
+/* line 22, ../sass/hotfix-header.scss */
+#hotfix-header a { font-weight: bold; text-decoration: none; }
+/* line 26, ../sass/hotfix-header.scss */
+#hotfix-header a:hover { text-decoration: underline; cursor: pointer; }
+
+/* line 34, ../sass/hotfix-header.scss */
+body, #header_infos, .bootstrap .page-head { margin-top: 40px !important; }
+
+/*# sourceMappingURL=hotfix-header.css.map */
