@@ -96,8 +96,6 @@ class HotFix extends Module
             ));
     }
 
-
-
     /**
      * Module uninstallation.
      *

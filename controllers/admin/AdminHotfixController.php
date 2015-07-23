@@ -97,12 +97,7 @@ class AdminHotfixController extends ModuleAdminController
         $patchDetails = $this->patches->getFirstPatchToDo();
 
         if ($success &= ($patchDetails !== null)) {
-
-            $patchLink = str_replace('{$guid}', $patchDetails['guid'], $this->settings->get('patch_location'));
-            $patchFolder = $this->settings->get('paths/backup');
-            if ($success &= Tools::copy($patchLink, $patchFolder.DIRECTORY_SEPARATOR.$patchDetails['guid'].'.zip')) {
-
-            }
+            $success &= $this->patches->installPatch($patchDetails);
         }
 
         if (!$success) {

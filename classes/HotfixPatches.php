@@ -32,6 +32,9 @@ class HotfixPatches
     /** @var HotfixSettings Settings object. */
     private $settings;
 
+    /** @var string Patch folder. */
+    private $patchFolder;
+
     /**
      * Constructor.
      *
@@ -40,6 +43,8 @@ class HotfixPatches
     public function __construct($settings)
     {
         $this->settings = $settings;
+
+        $this->patchFolder = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.$this->settings->get('paths/patches');
     }
 
     /**
@@ -143,5 +148,67 @@ class HotfixPatches
         $patchesToDo = $this->getPatchesToDo();
 
         return $patchesToDo[0];
+    }
+
+    /**
+     * Install the wanted patch.
+     *
+     * @param array $patchDetails Patch details (SQL row).
+     * @return bool Success of the operation
+     */
+    public function installPatch($patchDetails)
+    {
+        $patchLink = str_replace('{$guid}', $patchDetails['guid'], $this->settings->get('patch_location'));
+        $patchZip = $this->patchFolder.DIRECTORY_SEPARATOR.$patchDetails['guid'].'.zip';
+
+        return Tools::copy($patchLink, $patchZip)
+            && Tools::ZipExtract($patchZip, $this->patchFolder)
+            && $this->backupFilesForPatch($patchDetails['guid'])
+            && $this->preparePatchForShop()
+            && $this->executePatch();
+    }
+
+    /**
+     * Backup the files for a unzipped patch.
+     *
+     * @param string $guid GUID of the patch.
+     * @return bool Success of the operation.
+     */
+    final private function backupFilesForPatch($guid)
+    {
+        $filesList = json_decode(Tools::file_get_contents($this->patchFolder.DIRECTORY_SEPARATOR.'files_tree.json'), true);
+
+        HotfixClassesLoader::loadClass('Backup');
+        $backup = new HotfixBackup($this->settings);
+        return $backup->backupFilesForPatch($guid, $filesList);
+    }
+
+    /**
+     * Modify a patch file for adding the admin folder name.
+     *
+     * @return bool Success of the operation.
+     */
+    final private function preparePatchForShop()
+    {
+        $filePath = $this->patchFolder.DIRECTORY_SEPARATOR.'diff.patch';
+
+        $content = Tools::file_get_contents($filePath);
+        if (!$content) {
+            return false;
+        }
+
+        return file_put_contents(
+            $filePath,
+            preg_replace("/([0-9.]+)\\/admin\\//", "$1/"._PS_ADMIN_DIR_."/", $content)
+        );
+    }
+
+    final private function executePatch()
+    {
+        $filePath = $this->patchFolder.DIRECTORY_SEPARATOR.'diff.patch';
+
+        exec('patch -p1 -d '.realpath(_PS_CORE_DIR_).' < '.realpath($filePath), $result);
+
+        return true;
     }
 }
