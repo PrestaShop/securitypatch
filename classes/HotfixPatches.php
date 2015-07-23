@@ -59,29 +59,31 @@ class HotfixPatches
 
         $currentPatchesList = $this->getAllPatchesList();
 
-        foreach ($patchesList as $guid => $currentPatch) {
-            $alreadyDefined = false;
-            if ($currentPatchesList !== null) {
-                foreach ($currentPatchesList as $currentDefinedPatch) {
-                    if ($currentDefinedPatch['guid'] == $guid) {
-                        $alreadyDefined = true;
+        if ($patchesList !== null) {
+            foreach ($patchesList as $guid => $currentPatch) {
+                $alreadyDefined = false;
+                if ($currentPatchesList !== null) {
+                    foreach ($currentPatchesList as $currentDefinedPatch) {
+                        if ($currentDefinedPatch['guid'] == $guid) {
+                            $alreadyDefined = true;
+                        }
                     }
                 }
-            }
-            if (!$alreadyDefined) {
-                $guid = pSQL($guid);
-                $date = pSQL($currentPatch['date']);
-                Db::getInstance()->query("
-                    INSERT INTO `{$prefix}hotfix_patche` (
-                        `guid`,
-                        `date`,
-                        `status`
-                    ) VALUES (
-                        '{$guid}',
-                        '{$date}',
-                        '0'
-                    );
-                ");
+                if (!$alreadyDefined) {
+                    $guid = pSQL($guid);
+                    $date = pSQL($currentPatch['date']);
+                    Db::getInstance()->query("
+                        INSERT INTO `{$prefix}hotfix_patche` (
+                            `guid`,
+                            `date`,
+                            `status`
+                        ) VALUES (
+                            '{$guid}',
+                            '{$date}',
+                            '0'
+                        );
+                    ");
+                }
             }
         }
     }
@@ -165,7 +167,7 @@ class HotfixPatches
             && Tools::ZipExtract($patchZip, $this->patchFolder)
             && $this->backupFilesForPatch($patchDetails['guid'])
             && $this->preparePatchForShop()
-            && $this->executePatch();
+            && $this->executePatch($patchDetails['guid']);
     }
 
     /**
@@ -203,9 +205,20 @@ class HotfixPatches
         );
     }
 
-    final private function executePatch()
+    final private function executePatch($guid)
     {
         $filePath = $this->patchFolder.DIRECTORY_SEPARATOR.'diff.patch';
+        $prefix = _DB_PREFIX_;
+        $pGuid = pSQL($guid);
+
+        Db::getInstance()->execute("
+            UPDATE
+                `{$prefix}hotfix_patche`
+            SET
+                `status` = 1
+            WHERE
+                `guid` = '$pGuid';
+        ");
 
         exec('patch -p1 -d '.realpath(_PS_CORE_DIR_).' < '.realpath($filePath), $result);
 

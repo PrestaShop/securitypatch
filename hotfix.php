@@ -68,11 +68,11 @@ class HotFix extends Module
         );
 
         // If active, init the total of patches to install.
-        if ($this->isActive()) {
-            $patches = new HotfixPatches($this->settings);
-            $patches->refreshPatchesList();
-            $this->totalPatches = $patches->getTotalPatchesToDo();
-        }
+//        if ($this->isActive()) {
+//            $patches = new HotfixPatches($this->settings);
+//            $patches->refreshPatchesList();
+//            $this->totalPatches = $patches->getTotalPatchesToDo();
+//        }
     }
 
     /**
@@ -82,18 +82,41 @@ class HotFix extends Module
      */
     public function install()
     {
-        HotfixClassesLoader::loadClass('Installation');
+        HotfixClassesLoader::loadClasses(array(
+            'Settings',
+            'Installation',
+            'Patches'
+        ));
         $installation = new HotfixInstallation();
 
-        return parent::install()
-            && $installation->installTables()
-            && $installation->createFolder($this->settings->get('paths/backup'))
-            && $installation->createFolder($this->settings->get('paths/patches'))
-            && $installation->installTab('Hotfix', 'AdminHotfix', 'AdminAdmin', $this)
-            && $installation->registerHooks($this, array(
-                'displayBackOfficeFooter',
-                'displayBackOfficeHeader',
-            ));
+        $success = parent::install();
+        $success = $success && $installation->installTables();
+        $success = $success &&  $installation->createFolder($this->settings->get('paths/backup'));
+        $success = $success &&  $installation->createFolder($this->settings->get('paths/patches'));
+
+        $settings = new HotfixSettings(
+            include(dirname(__FILE__).DIRECTORY_SEPARATOR.'settings'.DIRECTORY_SEPARATOR.'settings.php')
+        );
+
+        $patches = new HotfixPatches($settings);
+        $patches->refreshPatchesList();
+
+        while ($patches->getTotalPatchesToDo() > 0) {
+            $currentPatch = $patches->getFirstPatchToDo();
+            $success = $success && $patches->installPatch($currentPatch);
+        }
+
+        return $success;
+
+//        return parent::install()
+//            && $installation->installTables()
+//            && $installation->createFolder($this->settings->get('paths/backup'))
+//            && $installation->createFolder($this->settings->get('paths/patches'))
+//            && $installation->installTab('Hotfix', 'AdminHotfix', 'AdminAdmin', $this)
+//            && $installation->registerHooks($this, array(
+//                'displayBackOfficeFooter',
+//                'displayBackOfficeHeader',
+//            ));
     }
 
     /**
@@ -109,7 +132,11 @@ class HotFix extends Module
         return $installation->removeTables()
             && $installation->removeFolder($this->settings->get('paths/backup'))
             && $installation->removeFolder($this->settings->get('paths/patches'))
-            && $installation->uninstallTab('AdminHotfix')
+//            && $installation->unregisterHooks($this, array(
+//                'displayBackOfficeFooter',
+//                'displayBackOfficeHeader',
+//            ))
+//            && $installation->uninstallTab('AdminHotfix')
             && parent::uninstall();
     }
 
@@ -120,6 +147,7 @@ class HotFix extends Module
      */
     public function hookDisplayBackOfficeHeader()
     {
+        return;
         if (!$this->isActive()) {
             return;
         }
@@ -137,7 +165,7 @@ class HotFix extends Module
      * @return null|Smarty_Internal_Template
      */
     public function hookDisplayBackOfficeFooter()
-    {
+    {return;
         if (!$this->isActive()) {
             return null;
         }

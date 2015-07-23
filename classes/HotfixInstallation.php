@@ -131,6 +131,24 @@ class HotfixInstallation
     }
 
     /**
+     * Unregister all needed hooks to the module.
+     *
+     * @param Module $module Module to anchor.
+     * @param array $hooks Hooks list.
+     * @return bool Success of the operation.
+     */
+    public function unregisterHooks($module, $hooks)
+    {
+        $success = true;
+
+        foreach ($hooks as $hook) {
+            $success &= $module->unregisterHook($hook);
+        }
+
+        return $success;
+    }
+
+    /**
      * Create a tab for the module.
      *
      * @param string $name Tab name.
