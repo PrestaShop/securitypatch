@@ -37,7 +37,7 @@ class HotFix extends Module
     private $settings = array();
 
     /** @var int Hotfixes count. */
-    private $count;
+    private $totalPatches;
 
     /**
      * Module's constructor.
@@ -58,7 +58,8 @@ class HotFix extends Module
         // Require the Hotfix classes loader and the main classes
         require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'HotfixClassesLoader.php';
         HotfixClassesLoader::loadClasses(array(
-            'Settings'
+            'Settings',
+            'Patches'
         ));
 
         // Load the settings.
@@ -66,7 +67,12 @@ class HotFix extends Module
             include(dirname(__FILE__).DIRECTORY_SEPARATOR.'settings'.DIRECTORY_SEPARATOR.'settings.php')
         );
 
-        $this->count = 13;
+        // If active, init the total of patches to install.
+        if ($this->isActive()) {
+            $patches = new HotfixPatches($this->settings);
+            $patches->refreshPatchesList();
+            $this->totalPatches = $patches->getTotalPatchesToDo();
+        }
     }
 
     /**
@@ -83,11 +89,14 @@ class HotFix extends Module
             && $installation->installTables()
             && $installation->createFolder($this->settings->get('paths/backup'))
             && $installation->createFolder($this->settings->get('paths/patches'))
+            && $installation->installTab('Hotfix', 'AdminHotfix', 'AdminAdmin', $this)
             && $installation->registerHooks($this, array(
                 'displayBackOfficeFooter',
                 'displayBackOfficeHeader',
             ));
     }
+
+
 
     /**
      * Module uninstallation.
@@ -102,6 +111,7 @@ class HotFix extends Module
         return $installation->removeTables()
             && $installation->removeFolder($this->settings->get('paths/backup'))
             && $installation->removeFolder($this->settings->get('paths/patches'))
+            && $installation->uninstallTab('AdminHotfix')
             && parent::uninstall();
     }
 
@@ -116,7 +126,7 @@ class HotFix extends Module
             return;
         }
 
-        if ($this->count > 0) {
+        if ($this->totalPatches > 0) {
             $this->context->controller->addCSS($this->_path.'views/css/hotfix-header.css', 'all');
         }
     }
@@ -134,9 +144,10 @@ class HotFix extends Module
             return null;
         }
 
-        if ($this->count > 0) {
+        if ($this->totalPatches > 0) {
             $this->context->smarty->assign(array(
-                'count' => $this->count
+                'count' => $this->totalPatches,
+                'link' => $this->context->link->getAdminLink('AdminHotfix'),
             ));
 
             return $this->display(__FILE__, 'header.tpl');
