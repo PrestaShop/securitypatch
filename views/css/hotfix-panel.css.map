@@ -1,7 +1,0 @@
-{
-"version": 3,
-"mappings": ";AAIQ,+BAAK,GACD,MAAM,EAAE,KAAK,EACb,OAAO,EAAE,KAAK;;AAGV,iDAAM,GACF,WAAW,EAAE,iBAAkC;;AAEnD,mDAAQ,GACJ,KAAK,ECAC,OAAO;;ADIjB,iDAAM,GACF,WAAW,EAAE,iBAAkC;;AAEnD,mDAAQ,GACJ,KAAK,ECNC,OAAO;;ADUjB,qDAAM,GACF,WAAW,EAAE,iBAAsC;;AAEvD,uDAAQ,GACJ,KAAK,ECfK,OAAO",
-"sources": ["../sass/hotfix-panel.scss","../sass/_settings.scss"],
-"names": [],
-"file": "hotfix-panel.css"
-}

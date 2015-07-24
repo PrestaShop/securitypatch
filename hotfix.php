@@ -36,9 +36,6 @@ class HotFix extends Module
     /** @var Array Module's settings. */
     private $settings = array();
 
-    /** @var int Hotfixes count. */
-    private $totalPatches;
-
     /**
      * Module's constructor.
      */
@@ -66,13 +63,6 @@ class HotFix extends Module
         $this->settings = new HotfixSettings(
             include(dirname(__FILE__).DIRECTORY_SEPARATOR.'settings'.DIRECTORY_SEPARATOR.'settings.php')
         );
-
-        // If active, init the total of patches to install.
-//        if ($this->isActive()) {
-//            $patches = new HotfixPatches($this->settings);
-//            $patches->refreshPatchesList();
-//            $this->totalPatches = $patches->getTotalPatchesToDo();
-//        }
     }
 
     /**
@@ -107,16 +97,6 @@ class HotFix extends Module
         }
 
         return $success;
-
-//        return parent::install()
-//            && $installation->installTables()
-//            && $installation->createFolder($this->settings->get('paths/backup'))
-//            && $installation->createFolder($this->settings->get('paths/patches'))
-//            && $installation->installTab('Hotfix', 'AdminHotfix', 'AdminAdmin', $this)
-//            && $installation->registerHooks($this, array(
-//                'displayBackOfficeFooter',
-//                'displayBackOfficeHeader',
-//            ));
     }
 
     /**
@@ -132,65 +112,6 @@ class HotFix extends Module
         return $installation->removeTables()
             && $installation->removeFolder($this->settings->get('paths/backup'))
             && $installation->removeFolder($this->settings->get('paths/patches'))
-//            && $installation->unregisterHooks($this, array(
-//                'displayBackOfficeFooter',
-//                'displayBackOfficeHeader',
-//            ))
-//            && $installation->uninstallTab('AdminHotfix')
             && parent::uninstall();
-    }
-
-    /**
-     * Add the needed files for this module to the header.
-     *
-     * @return null
-     */
-    public function hookDisplayBackOfficeHeader()
-    {
-        return;
-        if (!$this->isActive()) {
-            return;
-        }
-
-        if ($this->totalPatches > 0) {
-            $this->context->controller->addCSS($this->_path.'views/css/hotfix-header.css', 'all');
-        }
-    }
-
-    /**
-     * Method called by the hook "displayBackOfficeFooter".
-     *
-     * Add the template showing the need to hotfix a bug.
-     *
-     * @return null|Smarty_Internal_Template
-     */
-    public function hookDisplayBackOfficeFooter()
-    {return;
-        if (!$this->isActive()) {
-            return null;
-        }
-
-        if ($this->totalPatches > 0) {
-            $this->context->smarty->assign(array(
-                'count' => $this->totalPatches,
-                'link' => $this->context->link->getAdminLink('AdminHotfix'),
-            ));
-
-            return $this->display(__FILE__, 'header.tpl');
-        }
-
-        return null;
-    }
-
-    /**
-     * Return the active status of the module.
-     *
-     * @return bool Active status.
-     */
-    private final function isActive()
-    {
-        return Module::isEnabled($this->name)
-            && $this->active
-            && Tools::getValue('uninstall') != $this->name;
     }
 }
