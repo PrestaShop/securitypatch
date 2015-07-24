@@ -30,9 +30,8 @@ return array(
         'patches' => 'patches',
     ),
     'list' => array(
-        'location' => dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'list.json',
-//        'location' => dirname(__FILE__).DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'hotfixes_{$base_version}.json',
-//        'refresh_delay' => (3600 * 24 * 1),
+        'location' => dirname(__FILE__).DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'hotfixes_{$base_version}.json',
+        'refresh_delay' => (3600 * 24 * 1),
     ),
     'patch_location' => dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'{$guid}.zip',
 );
