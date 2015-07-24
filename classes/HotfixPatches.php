@@ -220,7 +220,7 @@ class HotfixPatches
                 `guid` = '$pGuid';
         ");
 
-        exec('patch -p1 -d '.realpath(_PS_CORE_DIR_).' < '.realpath($filePath), $result);
+        $result = exec('patch -p1 -d '.realpath(dirname(_PS_ADMIN_DIR_)).' < '.realpath($filePath));
 
         return true;
     }
