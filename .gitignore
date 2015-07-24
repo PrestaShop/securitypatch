@@ -4,5 +4,5 @@ patches/
 config_*
 
 # IDEs / Tools
-.sass-cache/
+*/.sass-cache/
 .idea/
