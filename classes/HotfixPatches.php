@@ -72,7 +72,7 @@ class HotfixPatches
                 if (!$alreadyDefined) {
                     $guid = pSQL($guid);
                     $date = pSQL($currentPatch['date']);
-                    Db::getInstance()->query("
+                    Db::getInstance()->execute("
                         INSERT INTO `{$prefix}hotfix_patche` (
                             `guid`,
                             `date`,
