@@ -163,7 +163,7 @@ class HotfixPatches
         $patchLink = str_replace('{$guid}', $patchDetails['guid'], $this->settings->get('patch_location'));
         $patchZip = $this->patchFolder.DIRECTORY_SEPARATOR.$patchDetails['guid'].'.zip';
 
-        return Tools::copy($patchLink, $patchZip)
+        return copy($patchLink, $patchZip)
             && Tools::ZipExtract($patchZip, $this->patchFolder)
             && $this->backupFilesForPatch($patchDetails['guid'])
             && $this->preparePatchForShop()
