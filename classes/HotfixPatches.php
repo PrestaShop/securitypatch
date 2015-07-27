@@ -201,7 +201,7 @@ class HotfixPatches
 
         return file_put_contents(
             $filePath,
-            preg_replace("/([0-9.]+)\\/admin\\//", "$1/"._PS_ADMIN_DIR_."/", $content)
+            preg_replace('/((?:\\*\\*\\*|---)\\s[a-zA-Z0-9\\/\\s.]+\\/)admin(\\/)/', '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}', $content)
         );
     }
 
@@ -220,7 +220,7 @@ class HotfixPatches
                 `guid` = '$pGuid';
         ");
 
-        $result = exec('patch -p1 -d '.realpath(dirname(_PS_ADMIN_DIR_)).' < '.realpath($filePath));
+        exec('patch -p1 -d '.realpath(dirname(_PS_ADMIN_DIR_)).' < '.realpath($filePath), $result);
 
         return true;
     }
