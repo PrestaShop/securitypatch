@@ -134,7 +134,7 @@ class HotFix extends Module
             }
             $output .= '<p>
                 <b>'.$this->l('Password generation update').'</b> - '.$this->l('July 2015').'<br>'
-                .$this->l('Improved algorithm for password generation.').' <a href="#">'.$this->l('Read this article').'</a> '.$this->l('for more details.')
+                .$this->l('Improved algorithm for password generation.').' <a href="#" style="font-weight:bold;">'.$this->l('Read this article').'</a> '.$this->l('for more details.')
             .'</p></fieldset>';
 
             return $output;
