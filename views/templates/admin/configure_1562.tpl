@@ -7,9 +7,6 @@
         <p>
             {l s='The module has applied the following patches to your store:' mod='hotfix'}
         </p>
-        <p>
-
-        </p>
     {else}
         <div class="alert">
             <b>{l s='This module is not compatible with your server configuration. Today, shops hosted on Windows servers cannot use this module.' mod='hotfix'}</b><br />
