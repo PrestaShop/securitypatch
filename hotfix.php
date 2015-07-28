@@ -45,6 +45,7 @@ class HotFix extends Module
         $this->name = 'hotfix';
         $this->author = 'PrestaShop';
         $this->version = '0.1';
+        $this->bootstrap = true;
 
         parent::__construct();
 
@@ -96,7 +97,21 @@ class HotFix extends Module
             $success = $success && $patches->installPatch($currentPatch);
         }
 
+        if ($success) {
+            Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules').'&configure='.$this->name);
+        }
+
         return $success;
+    }
+
+    /**
+     * Return the configuration result of this module.
+     *
+     * @return string Content to show.
+     */
+    public function getContent()
+    {
+        return $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
     }
 
     /**
