@@ -115,17 +115,32 @@ class HotFix extends Module
      */
     public function getContent()
     {
+        $isLinux = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
+
+        if (_PS_VERSION_ == '1.4.11.0') {
+            $output = '<h2>'.$this->l('Hotfix title ?').'</h2>';
+            if ($isLinux) {
+                $output .= '<div class="conf">
+                    <img src="../img/admin/ok2.png" alt=""> '.$this->l('Module successfully installed. Your shop benefits from the latest security update!')
+                .'</div>';
+            } else {
+                $output .= '<div class="error">
+                    <img src="../img/admin/error2.png"> '.$this->l('This module is not compatible with your server configuration. Today, shops hosted on Windows servers cannot use this module.')
+                    . '<br />'.$this->l('Please check the module’s configuration page to see how you can apply this patch to your shop.')
+                .'</div>';
+            }
+            return $output;
+        }
+
+
         $this->context->smarty->assign(array(
-            'isLinux' => strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN',
+            'isLinux' => $isLinux,
         ));
 
         $templateName = 'configure.tpl';
         switch (_PS_VERSION_) {
             case '1.5.6.2':
                 $templateName = 'configure_1562.tpl';
-                break;
-            case '1.4.11.0':
-                $templateName = 'configure_14110.tpl';
                 break;
         }
 
