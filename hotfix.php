@@ -129,7 +129,6 @@ class HotFix extends Module
         $installation = new HotfixInstallation();
 
         return $installation->removeTables()
-            && $installation->removeFolder($this->settings->get('paths/backup'))
             && $installation->removeFolder($this->settings->get('paths/patches'))
             && parent::uninstall();
     }
