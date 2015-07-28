@@ -54,9 +54,10 @@ class HotfixBackup
         $backupPath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.$this->settings->get('paths/backup');
 
         foreach ($filesList as $filePath) {
+            $adminDirArrayPath = explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_);
             $realFilePath = preg_replace(
                 '/((?:\\*\\*\\*|---)\\s[a-zA-Z0-9\\/\\s.]+\\/)admin(\\/)/',
-                '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}',
+                '${1}'.array_pop($adminDirArrayPath).'${2}',
                 $filePath
             );
 
