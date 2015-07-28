@@ -178,7 +178,7 @@ class HotfixPatches
      */
     final private function backupFilesForPatch($guid)
     {
-        $filesList = json_decode(Tools::file_get_contents($this->patchFolder.DIRECTORY_SEPARATOR.'files_tree.json'), true);
+        $filesList = json_decode(Tools::file_get_contents($this->patchFolder.DIRECTORY_SEPARATOR.'files_list.json'), true);
 
         HotfixClassesLoader::loadClass('Backup');
         $backup = new HotfixBackup($this->settings);

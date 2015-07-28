@@ -51,6 +51,24 @@ class HotfixBackup
      */
     public function backupFilesForPatch($guid, $filesList)
     {
+        $backupPath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.$this->settings->get('paths/backup');
+
+        foreach ($filesList as $filePath) {
+            $realFilePath = preg_replace(
+                '/((?:\\*\\*\\*|---)\\s[a-zA-Z0-9\\/\\s.]+\\/)admin(\\/)/',
+                '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}',
+                $filePath
+            );
+
+            $originalFile = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.$realFilePath;
+            $backupFile = $backupPath.DIRECTORY_SEPARATOR.$realFilePath;
+
+            if (!Tools::file_exists_no_cache($backupFile) && Tools::file_exists_no_cache($originalFile)) {
+                mkdir(dirname($backupFile), 0777, true);
+                copy($originalFile, $backupFile);
+            }
+        }
+
         return true;
     }
 }
