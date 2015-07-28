@@ -50,8 +50,8 @@ class HotFix extends Module
         parent::__construct();
 
         // Module's presentation
-        $this->displayName = $this->l('HotFix');
-        $this->description = $this->l('Security & important updates patcher.');
+        $this->displayName = $this->l('Security Patch');
+        $this->description = $this->l('This module improves your shop\'s safety by applying the latest security patches from PrestaShop.');
 
         // Require the Hotfix classes loader and the main classes
         require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'HotfixClassesLoader.php';
@@ -118,20 +118,27 @@ class HotFix extends Module
         $isLinux = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
 
         if (_PS_VERSION_ == '1.4.11.0') {
-            $output = '<h2>'.$this->l('Hotfix title ?').'</h2>';
+            $output = '<h2>'.$this->l('Security Patch').'</h2><fieldset>';
             if ($isLinux) {
                 $output .= '<div class="conf">
                     <img src="../img/admin/ok2.png" alt=""> '.$this->l('Module successfully installed. Your shop benefits from the latest security update!')
-                .'</div>';
+                .'</div>
+                <p>
+                    '.$this->l('The module has applied the following patches to your store:')
+                .'</p>';
             } else {
                 $output .= '<div class="error">
-                    <img src="../img/admin/error2.png"> '.$this->l('This module is not compatible with your server configuration. Today, shops hosted on Windows servers cannot use this module.')
-                    . '<br />'.$this->l('Please check the module’s configuration page to see how you can apply this patch to your shop.')
+                    <img src="../img/admin/error2.png"> '.$this->l('Your shop is hosted on a Windows server. Unfortunately, the module is not compatible with this configuration yet.').'<br>'
+                    .'<span style="font-weight: normal">'.$this->l('Please check the details for each update to see how you can implement the patch on your shop:').'</span>'
                 .'</div>';
             }
+            $output .= '<p>
+                <b>'.$this->l('Password generation update').'</b> - '.$this->l('July 2015').'<br>'
+                .$this->l('Improved algorithm for password generation.').' <a href="#">'.$this->l('Read this article').'</a> '.$this->l('for more details.')
+            .'</p></fieldset>';
+
             return $output;
         }
-
 
         $this->context->smarty->assign(array(
             'isLinux' => $isLinux,

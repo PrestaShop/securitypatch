@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="panel">
-        <h3>{l s='Hotfix title ?' mod='hotfix'}</h3>
+        <h3>{l s='Security Patch' mod='hotfix'}</h3>
         {if $isLinux == true}
             <div class="alert alert-success">
                 {l s='Module successfully installed. Your shop benefits from the latest security update!' mod='hotfix'}

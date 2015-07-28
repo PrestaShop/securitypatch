@@ -1,4 +1,4 @@
-<h2>{l s='Hotfix title ?' mod='hotfix'}</h2>
+<h2>{l s='Security Patch' mod='hotfix'}</h2>
 <fieldset>
     {if $isLinux == true}
         <div class="conf ok">
