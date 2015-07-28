@@ -112,7 +112,7 @@ class HotFix extends Module
     public function getContent()
     {
         $this->context->smarty->assign(array(
-            'isLinux' => strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN',
+            'isLinux' => strtoupper(substr(PHP_OS, 0, 3)) === 'WIN',
         ));
 
         return $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
