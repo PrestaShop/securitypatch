@@ -98,7 +98,11 @@ class HotFix extends Module
         }
 
         if ($success) {
-            Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules').'&configure='.$this->name);
+            if (_PS_VERSION_ == '1.4.11.0') {
+                Tools::redirectAdmin('index.php?tab=AdminModules&configure='.$this->name.'&token='.Tools::getValue('token'));
+            } else {
+                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules').'&configure='.$this->name);
+            }
         }
 
         return $success;
