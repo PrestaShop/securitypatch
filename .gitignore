@@ -2,6 +2,7 @@
 backup/
 patches/
 config_*
+config.xml
 
 # IDEs / Tools
 */.sass-cache/
