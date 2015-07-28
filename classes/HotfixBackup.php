@@ -56,15 +56,15 @@ class HotfixBackup
         foreach ($filesList as $filePath) {
             $adminDirArrayPath = explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_);
             $realFilePath = preg_replace(
-                '/((?:\\*\\*\\*|---)\\s[a-zA-Z0-9\\/\\s.]+\\/)admin(\\/)/',
-                '${1}'.array_pop($adminDirArrayPath).'${2}',
+                '/^admin(\\/)/',
+                array_pop($adminDirArrayPath).'${1}',
                 $filePath
             );
 
             $originalFile = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.$realFilePath;
             $backupFile = $backupPath.DIRECTORY_SEPARATOR.$realFilePath;
 
-            if (!Tools::file_exists_no_cache($backupFile) && Tools::file_exists_no_cache($originalFile)) {
+            if (!file_exists($backupFile) && file_exists($originalFile)) {
                 mkdir(dirname($backupFile), 0777, true);
                 copy($originalFile, $backupFile);
             }
