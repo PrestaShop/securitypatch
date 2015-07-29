@@ -159,7 +159,7 @@ class HotFix extends Module
                 if (!$execAvailable) {
                     $output .= '<div class="error">
                         <img src="../img/admin/error2.png"> '.$this->l('The security update could not be applied to your shop. The module cannot execute the patch on your server configuration.').'<br>'
-                        .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop:').'</span>'
+                        .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop.').'</span>'
                     .'</div>';
                 }
                 else {
@@ -173,7 +173,7 @@ class HotFix extends Module
             } else {
                 $output .= '<div class="error">
                     <img src="../img/admin/error2.png"> '.$this->l('Your shop is hosted on a Windows server. Unfortunately, the module is not compatible with this configuration yet.').'<br>'
-                    .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop:').'</span>'
+                    .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop.').'</span>'
                 .'</div>';
             }
 

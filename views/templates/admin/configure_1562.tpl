@@ -4,7 +4,7 @@
         {if !$execAvailable}
             <div class="alert">
                 <b>{l s='The security update could not be applied to your shop. The module cannot execute the patch on your server configuration.' mod='hotfix'}</b><br />
-                {l s='Please check the details below for each update to see how you can implement the patch on your shop:' mod='hotfix'}
+                {l s='Please check the details below for each update to see how you can implement the patch on your shop.' mod='hotfix'}
             </div>
         {else}
             <div class="conf ok">
@@ -15,6 +15,10 @@
             </p>
         {/if}
     {else}
+        <div class="alert">
+            <b>{l s='Your shop is hosted on a Windows server. Unfortunately, the module is not compatible with this configuration yet.' mod='hotfix'}</b><br />
+            {l s='Please check the details below for each update to see how you can implement the patch on your shop.' mod='hotfix'}
+        </div>
     {/if}
     <p>
         <b>{l s='Password generation update' mod='hotfix'}</b> - {l s='July 2015' mod='hotfix'}<br>
