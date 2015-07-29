@@ -190,8 +190,16 @@ class HotFix extends Module
             return $output;
         }
 
+        $language = Language::getIsoById($this->context->cookie->id_lang);
+        $link = $this->settings->get('links/patches/password/'.$language);
+        if ($link == '' || $link == null) {
+            $link = $this->settings->get('links/patches/password/en');
+        }
+
         $this->context->smarty->assign(array(
             'isLinux' => $isLinux,
+            'execAvailable' => $execAvailable,
+            'link' => $link,
         ));
 
         $templateName = 'configure.tpl';
