@@ -132,8 +132,9 @@ class HotFix extends Module
         }
 
         $result = array();
-        exec('hash patch', $result);
-        if (count($result) != 0) {
+        $return = 1;
+        exec('hash patch', $result, $return);
+        if ($return == 1) {
             return false;
         }
 
