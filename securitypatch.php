@@ -31,7 +31,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * HotFix module main class.
  */
-class HotFix extends Module
+class Securitypatch extends Module
 {
     /** @var Array Module's settings. */
     private $settings = array();
@@ -42,7 +42,7 @@ class HotFix extends Module
     public function __construct()
     {
         // Module's base configuration
-        $this->name = 'hotfix';
+        $this->name = 'securitypatch';
         $this->author = 'PrestaShop';
         $this->version = '0.1';
         $this->bootstrap = true;
