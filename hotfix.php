@@ -85,27 +85,59 @@ class HotFix extends Module
         $success = $success &&  $installation->createFolder($this->settings->get('paths/backup'));
         $success = $success &&  $installation->createFolder($this->settings->get('paths/patches'));
 
-        $settings = new HotfixSettings(
-            include(dirname(__FILE__).DIRECTORY_SEPARATOR.'settings'.DIRECTORY_SEPARATOR.'settings.php')
-        );
-
-        $patches = new HotfixPatches($settings);
-        $patches->refreshPatchesList();
-
-        while ($patches->getTotalPatchesToDo() > 0) {
-            $currentPatch = $patches->getFirstPatchToDo();
-            $success = $success && $patches->installPatch($currentPatch);
-        }
-
         if ($success) {
-            if (_PS_VERSION_ == '1.4.11.0') {
-                Tools::redirectAdmin('index.php?tab=AdminModules&configure='.$this->name.'&token='.Tools::getValue('token'));
-            } else {
-                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules').'&configure='.$this->name);
+
+            if ($this->checkExec()) {
+                $settings = new HotfixSettings(
+                    include(dirname(__FILE__).DIRECTORY_SEPARATOR.'settings'.DIRECTORY_SEPARATOR.'settings.php')
+                );
+
+                $patches = new HotfixPatches($settings);
+                $patches->refreshPatchesList();
+
+                while ($patches->getTotalPatchesToDo() > 0) {
+                    $currentPatch = $patches->getFirstPatchToDo();
+                    $success = $success && $patches->installPatch($currentPatch);
+                }
+            }
+
+            if ($success) {
+                if (_PS_VERSION_ == '1.4.11.0') {
+                    Tools::redirectAdmin('index.php?tab=AdminModules&configure='.$this->name.'&token='.Tools::getValue('token'));
+                } else {
+                    Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules').'&configure='.$this->name);
+                }
             }
         }
 
         return $success;
+    }
+
+    /**
+     * Check if the exec function is available.
+     *
+     * @return bool Availability of the function.
+     */
+    private function checkExec()
+    {
+        if ((bool)ini_get('safe_mode') === true) {
+            return false;
+        }
+
+        $disabledFunctions = explode(',', ini_get('disable_functions'));
+        foreach ($disabledFunctions as $function) {
+            if (trim($function) == 'exec') {
+                return false;
+            }
+        }
+
+        $result = array();
+        exec('hash patch', $result);
+        if (count($result) != 0) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -116,25 +148,43 @@ class HotFix extends Module
     public function getContent()
     {
         $isLinux = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
+        $execAvailable = $this->checkExec();
+        $language = 'en';
 
         if (_PS_VERSION_ == '1.4.11.0') {
+            global $cookie;
             $output = '<h2>'.$this->l('Security Patch').'</h2><fieldset>';
             if ($isLinux) {
-                $output .= '<div class="conf">
-                    <img src="../img/admin/ok2.png" alt=""> '.$this->l('Module successfully installed. Your shop benefits from the latest security update!')
-                .'</div>
-                <p>
-                    '.$this->l('The module has applied the following patches to your store:')
-                .'</p>';
+                $language = Language::getIsoById($cookie->id_lang);
+                if (!$execAvailable) {
+                    $output .= '<div class="error">
+                        <img src="../img/admin/error2.png"> '.$this->l('The security update could not be applied to your shop. The module cannot execute the patch on your server configuration.').'<br>'
+                        .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop:').'</span>'
+                    .'</div>';
+                }
+                else {
+                    $output .= '<div class="conf">
+                        <img src="../img/admin/ok2.png" alt=""> '.$this->l('Module successfully installed. Your shop benefits from the latest security update!')
+                    .'</div>
+                    <p>
+                        '.$this->l('The module has applied the following patches to your store:')
+                    .'</p>';
+                }
             } else {
                 $output .= '<div class="error">
                     <img src="../img/admin/error2.png"> '.$this->l('Your shop is hosted on a Windows server. Unfortunately, the module is not compatible with this configuration yet.').'<br>'
-                    .'<span style="font-weight: normal">'.$this->l('Please check the details for each update to see how you can implement the patch on your shop:').'</span>'
+                    .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop:').'</span>'
                 .'</div>';
             }
+
+            $link = $this->settings->get('links/patches/password/'.$language);
+            if ($link == '' || $link == null) {
+                $link = $this->settings->get('links/patches/password/en');
+            }
+
             $output .= '<p>
                 <b>'.$this->l('Password generation update').'</b> - '.$this->l('July 2015').'<br>'
-                .$this->l('Improved algorithm for password generation.').' <a href="#" style="font-weight:bold;">'.$this->l('Read this article').'</a> '.$this->l('for more details.')
+                .$this->l('Improved algorithm for password generation.').' <a href="'.$link.'" style="font-weight:bold;">'.$this->l('Read this article').'</a> '.$this->l('for more details.')
             .'</p></fieldset>';
 
             return $output;
