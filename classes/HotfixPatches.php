@@ -54,35 +54,37 @@ class HotfixPatches
     {
         $prefix = _DB_PREFIX_;
 
-        $patchesListLocation = str_replace('{$base_version}', _PS_VERSION_, $this->settings->get('list/location'));
-        $patchesList = json_decode(Tools::file_get_contents($patchesListLocation), true);
+        $allPatchesList = include dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'list.php';
+        $patchesList = isset($allPatchesList[_PS_VERSION_]) ? $allPatchesList[_PS_VERSION_] : null;
 
-        $currentPatchesList = $this->getAllPatchesList();
+        if ($patchesList) {
+            $currentPatchesList = $this->getAllPatchesList();
 
-        if ($patchesList !== null) {
-            foreach ($patchesList as $guid => $currentPatch) {
-                $alreadyDefined = false;
-                if ($currentPatchesList !== null) {
-                    foreach ($currentPatchesList as $currentDefinedPatch) {
-                        if ($currentDefinedPatch['guid'] == $guid) {
-                            $alreadyDefined = true;
+            if ($patchesList !== null) {
+                foreach ($patchesList as $currentPatch) {
+                    $alreadyDefined = false;
+                    if ($currentPatchesList !== null) {
+                        foreach ($currentPatchesList as $currentDefinedPatch) {
+                            if ($currentDefinedPatch['guid'] == $currentPatch) {
+                                $alreadyDefined = true;
+                            }
                         }
                     }
-                }
-                if (!$alreadyDefined) {
-                    $guid = pSQL($guid);
-                    $date = pSQL($currentPatch['date']);
-                    Db::getInstance()->execute("
-                        INSERT INTO `{$prefix}hotfix_patche` (
-                            `guid`,
-                            `date`,
-                            `status`
-                        ) VALUES (
-                            '{$guid}',
-                            '{$date}',
-                            '0'
-                        );
-                    ");
+                    if (!$alreadyDefined) {
+                        $guid = pSQL($currentPatch);
+                        $date = date('Y-m-d');
+                        Db::getInstance()->execute("
+                            INSERT INTO `{$prefix}hotfix_patche` (
+                                `guid`,
+                                `date`,
+                                `status`
+                            ) VALUES (
+                                '{$guid}',
+                                '{$date}',
+                                '0'
+                            );
+                        ");
+                    }
                 }
             }
         }
@@ -160,11 +162,9 @@ class HotfixPatches
      */
     public function installPatch($patchDetails)
     {
-        $patchLink = str_replace('{$guid}', $patchDetails['guid'], $this->settings->get('patch_location'));
-        $patchZip = $this->patchFolder.DIRECTORY_SEPARATOR.$patchDetails['guid'].'.zip';
+        $patchZip = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.$patchDetails['guid'].'.zip';
 
-        return Tools::copy($patchLink, $patchZip)
-            && Tools::ZipExtract($patchZip, $this->patchFolder)
+        return Tools::ZipExtract($patchZip, $this->patchFolder)
             && $this->backupFilesForPatch($patchDetails['guid'])
             && $this->preparePatchForShop()
             && $this->executePatch($patchDetails['guid']);
@@ -178,7 +178,7 @@ class HotfixPatches
      */
     final private function backupFilesForPatch($guid)
     {
-        $filesList = json_decode(Tools::file_get_contents($this->patchFolder.DIRECTORY_SEPARATOR.'files_tree.json'), true);
+        $filesList = json_decode(Tools::file_get_contents($this->patchFolder.DIRECTORY_SEPARATOR.'files_list.json'), true);
 
         HotfixClassesLoader::loadClass('Backup');
         $backup = new HotfixBackup($this->settings);
@@ -201,7 +201,7 @@ class HotfixPatches
 
         return file_put_contents(
             $filePath,
-            preg_replace('/((?:\\*\\*\\*|---)\\s[a-zA-Z0-9\\/\\s.]+\\/)admin(\\/)/', '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}', $content)
+            preg_replace('/^([\\*-]{3}\\s[\\w]*\\/)admin(.*)/m', '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}', $content)
         );
     }
 

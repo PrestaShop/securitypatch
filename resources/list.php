@@ -29,8 +29,13 @@ if (!defined('_PS_VERSION_')) {
 }
 
 return array(
-    'paths' => array(
-        'backup' => 'backup',
-        'patches' => 'patches',
+    '1.6.0.14' => array(
+        'HF16014001',
+    ),
+    '1.5.6.2' => array(
+        'HF1562001',
+    ),
+    '1.4.11.0' => array(
+        'HF14110001',
     ),
 );

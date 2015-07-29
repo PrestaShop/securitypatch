@@ -45,12 +45,13 @@ class HotFix extends Module
         $this->name = 'hotfix';
         $this->author = 'PrestaShop';
         $this->version = '0.1';
+        $this->bootstrap = true;
 
         parent::__construct();
 
         // Module's presentation
-        $this->displayName = $this->l('HotFix');
-        $this->description = $this->l('Security & important updates patcher.');
+        $this->displayName = $this->l('Security Patch');
+        $this->description = $this->l('This module improves your shop\'s safety by applying the latest security patches from PrestaShop.');
 
         // Require the Hotfix classes loader and the main classes
         require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'HotfixClassesLoader.php';
@@ -96,7 +97,61 @@ class HotFix extends Module
             $success = $success && $patches->installPatch($currentPatch);
         }
 
+        if ($success) {
+            if (_PS_VERSION_ == '1.4.11.0') {
+                Tools::redirectAdmin('index.php?tab=AdminModules&configure='.$this->name.'&token='.Tools::getValue('token'));
+            } else {
+                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminModules').'&configure='.$this->name);
+            }
+        }
+
         return $success;
+    }
+
+    /**
+     * Return the configuration result of this module.
+     *
+     * @return string Content to show.
+     */
+    public function getContent()
+    {
+        $isLinux = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
+
+        if (_PS_VERSION_ == '1.4.11.0') {
+            $output = '<h2>'.$this->l('Security Patch').'</h2><fieldset>';
+            if ($isLinux) {
+                $output .= '<div class="conf">
+                    <img src="../img/admin/ok2.png" alt=""> '.$this->l('Module successfully installed. Your shop benefits from the latest security update!')
+                .'</div>
+                <p>
+                    '.$this->l('The module has applied the following patches to your store:')
+                .'</p>';
+            } else {
+                $output .= '<div class="error">
+                    <img src="../img/admin/error2.png"> '.$this->l('Your shop is hosted on a Windows server. Unfortunately, the module is not compatible with this configuration yet.').'<br>'
+                    .'<span style="font-weight: normal">'.$this->l('Please check the details for each update to see how you can implement the patch on your shop:').'</span>'
+                .'</div>';
+            }
+            $output .= '<p>
+                <b>'.$this->l('Password generation update').'</b> - '.$this->l('July 2015').'<br>'
+                .$this->l('Improved algorithm for password generation.').' <a href="#" style="font-weight:bold;">'.$this->l('Read this article').'</a> '.$this->l('for more details.')
+            .'</p></fieldset>';
+
+            return $output;
+        }
+
+        $this->context->smarty->assign(array(
+            'isLinux' => $isLinux,
+        ));
+
+        $templateName = 'configure.tpl';
+        switch (_PS_VERSION_) {
+            case '1.5.6.2':
+                $templateName = 'configure_1562.tpl';
+                break;
+        }
+
+        return $this->context->smarty->fetch($this->local_path.'views/templates/admin/'.$templateName);
     }
 
     /**
@@ -110,7 +165,6 @@ class HotFix extends Module
         $installation = new HotfixInstallation();
 
         return $installation->removeTables()
-            && $installation->removeFolder($this->settings->get('paths/backup'))
             && $installation->removeFolder($this->settings->get('paths/patches'))
             && parent::uninstall();
     }
