@@ -201,7 +201,7 @@ class HotfixPatches
 
         return file_put_contents(
             $filePath,
-            preg_replace('/((?:\\*\\*\\*|---)\\s[a-zA-Z0-9\\/\\s.]+\\/)admin(\\/)/', '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}', $content)
+            preg_replace('/^([\\*-]{3}\\s[\\w]*\\/)admin(.*)/m', '${1}'.array_pop(explode(DIRECTORY_SEPARATOR, _PS_ADMIN_DIR_)).'${2}', $content)
         );
     }
 
