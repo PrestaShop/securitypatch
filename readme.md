@@ -1,6 +1,6 @@
 #Hotfix
 
-Version **0.1**
+Version **1.0.0**
 
 > This module allow older PrestaShop version to be upgraded only for small security fixes.
 
