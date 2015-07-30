@@ -210,7 +210,7 @@ class Securitypatch extends Module
                 break;
         }
 
-        return $this->context->smarty->fetch($this->local_path.'views/templates/admin/'.$templateName);
+        return $this->display(__FILE__, 'views/templates/admin/'.$templateName);
     }
 
     /**
