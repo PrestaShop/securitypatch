@@ -44,7 +44,7 @@ class Securitypatch extends Module
         // Module's base configuration
         $this->name = 'securitypatch';
         $this->author = 'PrestaShop';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->bootstrap = true;
 
         parent::__construct();
