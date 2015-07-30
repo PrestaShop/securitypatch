@@ -82,8 +82,9 @@ class Securitypatch extends Module
 
         $success = parent::install();
         $success = $success && $installation->installTables();
-        $success = $success &&  $installation->createFolder($this->settings->get('paths/backup'));
-        $success = $success &&  $installation->createFolder($this->settings->get('paths/patches'));
+        $success = $success && $installation->createFolder($this->settings->get('paths/backup'));
+        $success = $success && $installation->createFolder($this->settings->get('paths/patches'));
+        $success = $success && Configuration::updateValue('SECURITYPATCH_EXEC_RESULT', 1);
 
         if ($success) {
 
@@ -150,6 +151,7 @@ class Securitypatch extends Module
     {
         $isLinux = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
         $execAvailable = $this->checkExec();
+        $execSuccess = Configuration::get('SECURITYPATCH_EXEC_RESULT') == 0;
         $language = 'en';
 
         if (_PS_VERSION_ == '1.4.11.0') {
@@ -157,7 +159,7 @@ class Securitypatch extends Module
             $output = '<h2>'.$this->l('Security Patch').'</h2><fieldset>';
             if ($isLinux) {
                 $language = Language::getIsoById($cookie->id_lang);
-                if (!$execAvailable) {
+                if (!$execAvailable || !$execSuccess) {
                     $output .= '<div class="error">
                         <img src="../img/admin/error2.png"> '.$this->l('The security update could not be applied to your shop. The module cannot execute the patch on your server configuration.').'<br>'
                         .'<span style="font-weight: normal">'.$this->l('Please check the details below for each update to see how you can implement the patch on your shop.').'</span>'
@@ -201,6 +203,7 @@ class Securitypatch extends Module
             'isLinux' => $isLinux,
             'execAvailable' => $execAvailable,
             'link' => $link,
+            'execSuccess' => $execSuccess,
         ));
 
         $templateName = 'configure.tpl';
@@ -225,6 +228,7 @@ class Securitypatch extends Module
 
         return $installation->removeTables()
             && $installation->removeFolder($this->settings->get('paths/patches'))
+            && Configuration::deleteByName('SECURITYPATCH_EXEC_RESULT')
             && parent::uninstall();
     }
 }

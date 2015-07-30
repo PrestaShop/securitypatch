@@ -220,7 +220,10 @@ class HotfixPatches
                 `guid` = '$pGuid';
         ");
 
-        exec('patch -p1 -d '.realpath(dirname(_PS_ADMIN_DIR_)).' < '.realpath($filePath), $result);
+        $result = array();
+        $return = 1;
+        exec('patch -p1 -d '.realpath(dirname(_PS_ADMIN_DIR_)).' < '.realpath($filePath), $result, $return);
+        Configuration::updateValue('SECURITYPATCH_EXEC_RESULT', $return);
 
         return true;
     }

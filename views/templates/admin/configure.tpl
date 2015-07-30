@@ -2,8 +2,8 @@
     <div class="col-lg-12">
         <div class="panel">
             <h3>{l s='Security Patch' mod='securitypatch'}</h3>
-            {if $isLinux == true}
-                {if !$execAvailable}
+            {if $isLinux}
+                {if !$execAvailable || !$execSuccess}
                     <div class="alert alert-danger">
                         <b>{l s='The security update could not be applied to your shop. The module cannot execute the patch on your server configuration.' mod='securitypatch'}</b><br />
                         {l s='Please check the details below for each update to see how you can implement the patch on your shop.' mod='securitypatch'}

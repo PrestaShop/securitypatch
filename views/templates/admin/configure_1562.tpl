@@ -1,7 +1,7 @@
 <h2>{l s='Security Patch' mod='securitypatch'}</h2>
 <fieldset>
     {if $isLinux == true}
-        {if !$execAvailable}
+        {if !$execAvailable || !$execSuccess}
             <div class="alert">
                 <b>{l s='The security update could not be applied to your shop. The module cannot execute the patch on your server configuration.' mod='securitypatch'}</b><br />
                 {l s='Please check the details below for each update to see how you can implement the patch on your shop.' mod='securitypatch'}
