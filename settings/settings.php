@@ -37,7 +37,7 @@ return array(
         'patches' => array(
             'password' => array(
                 'en' => 'https://www.prestashop.com/blog/en/prestashop-security-release/',
-                'fr' => 'https://www.prestashop.com/blog/fr/mise-a-jour-de-securite-pour-prestashop/',
+                'fr' => 'https://www.prestashop.com/blog/fr/mise-jour-securite-prestashop/',
             ),
         ),
     ),
